@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class {{ModelTemplateClass}} extends Model
+{
+
+    /** The database table used by the model. */
+
+    protected $table = '{{table}}';
+
+    /** Attributes that should be mass-assignable. */
+    protected $fillable = {{fields}};
+
+    {{relation}}
+
+}
