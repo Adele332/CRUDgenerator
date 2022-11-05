@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Http\Controllers{{DirectoryName}};
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\{{ModelName}};
+
+class {{ControllerTemplateClass}}Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        ${{ControllerNameLowerCase}} = {{ModelName}}::all();
+        return view('admin.{{ControllerNameLowerCase}}.index', compact('{{ControllerNameLowerCase}}'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('admin.{{ControllerNameLowerCase}}.form');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        {{validationFields}}
+
+        {{ModelName}}::create($request->all());
+        return redirect('admin/{{ControllerNameLowerCase}}')->with('success', '{{ControllerNameSingular}} added successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
+        return view('admin.{{ControllerNameLowerCase}}.show', compact('{{ControllerNameSingularLowerCase}}'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
+        return view('admin.{{ControllerNameLowerCase}}.form', compact('{{ControllerNameSingularLowerCase}}'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        {{validationFields}}
+
+        ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
+        ${{ControllerNameSingularLowerCase}}->update($request->all());
+        return redirect('admin/{{ControllerNameLowerCase}}')->with('success', '{{ControllerNameSingular}} updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
+        ${{ControllerNameSingularLowerCase}}->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
+        return redirect('admin/{{ControllerNameLowerCase}}')->with('success', '{{ControllerNameSingular}} deleted successfully.');
+    }
+}

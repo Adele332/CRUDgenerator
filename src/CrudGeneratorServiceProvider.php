@@ -14,8 +14,10 @@ class CrudGeneratorServiceProvider extends ServiceProvider
     public function register()
     {
         $commands =
-            ['adele332\crudgenerator\Commands\Models\ModelCommand'
-            ];
+            ['adele332\crudgenerator\Commands\Models\ModelCommand',
+                'adele332\crudgenerator\Commands\Controllers\ControllerCommand',
+                'adele332\crudgenerator\Commands\Views\ViewCommand'];
+
         $this->commands($commands);
     }
 

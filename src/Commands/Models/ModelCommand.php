@@ -5,7 +5,7 @@ namespace adele332\crudgenerator\Commands\Models;
 use Illuminate\Console\Command;
 use Illuminate\Console\GeneratorCommand;
 
-class ModelCommand extends Command
+class ModelCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
