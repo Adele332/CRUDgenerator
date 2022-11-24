@@ -1,57 +1,38 @@
-@extends('layouts.admin')
-
-@section('title', 'Companies')
+@extends('layout')
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <a href="{{ url('admin/companies/create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add company</a>
-        </div>
-        <div class="card-body">
-            @if(Session::has('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ Session::get('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                    @php
-                        Session::forget('success');
-                    @endphp
-                </div>
-            @endif
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Website</th>
-                        <th>Address</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($companies as $item) {{-- iš valdiklio gavom autorių masyvą $companies; kadangi tai masyvas, reikia jį išskaidyti elementais --}}
-                    <tr>
-                        <td>{{ $item->id }}</td>
-                        <td>{{ $item->title }}</td>
-                        <td>{{ $item->website }}</td>
-                        <td>{{ $item->address }}</td>
-                        <td>{{ $item->phone }}</td>
-                        <td>
-                            <a href="{{ url('admin/companies/'.$item->id.'/edit') }}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                            <a href="{{ url('admin/companies/'.$item->id) }}" class="btn btn-success btn-sm"><i class="fas fa-eye"></i> View</a>
-                            {!! Form::open(['method'=>'DELETE', 'url' => ['admin/companies', $item->id], 'style' => 'display:inline']) !!}
-                            {!! Form::button('<i class="fas fa-trash-alt"></i> Delete', ['class' => 'btn btn-danger btn-sm', 'type' => 'submit']) !!}
-                            {!! Form::close() !!}
-                        </td>
-                    </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
+    <div class="card-header">{{ViewName}}</div>
+    <div class="card-body">
+        <button class="btn btn-success btn-sm" style="float: right;">Add New</button>
+        <br>
+        <br>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>{{Col1}}</th>
+                    <th>{{Col2}}</th>
+                    <th>{{Col3}}</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach({{{{NameLowerCase}}}} as $item)
+                <tr>
+                    <td>{{ $item->{{col1}} }}</td>
+                    <td>{{ $item->{{col2}} }}</td>
+                    <td>{{ $item->{{col3}} }}</td>
+                    <td>
+                        <a href="{{ url('admin/{{NameLowerCase}}/'.$item->id) }}" > <button class="btn btn-info btn-sm">View</button></a>
+                        <a href="/admin" > <button class="btn btn-primary btn-sm">Edit</button></a>
+                        <a href="/admin" > <button class="btn btn-danger btn-sm"> Delete</button></a>
+                    </td>
+                </tr>
+                @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection
+

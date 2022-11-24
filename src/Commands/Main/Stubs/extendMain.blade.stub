@@ -1,0 +1,14 @@
+@extends('layout')
+
+@section('content')
+    <div class="card-header">Welcome to your CRUD generator!</div>
+    <div class="card-body">
+        About this CRUD generator:
+        <ul>
+            <li>In your left side you can see all tables names in your connected database.</li>
+            <li>You can select table to see all records in that table.</li>
+            <li>You can view more details for each record in the table.</li>
+            <li>With this CRUD generator if you have admin permission you can Create, Read, Update, Delete records in tables.</li>
+        </ul>
+    </div>
+@endsection

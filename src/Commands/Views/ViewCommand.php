@@ -3,9 +3,11 @@
 namespace adele332\crudgenerator\Commands\Views;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Exception;
 
-class ViewCommand extends GeneratorCommand
+class ViewCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -13,10 +15,9 @@ class ViewCommand extends GeneratorCommand
      */
 
     protected $signature = 'make:view
-                            {name-of-view : The name of newly created view.}
-                            {--crud= : Name of created crud for functions.}
-                            {--fields-for-view= : Fields that will be used for form in newly created views.}
-                            {--file-path= : The place where the views will be saved.}';
+                            {name-of-view : The name of newly created view. example Genres}
+                            {--crud= : Name of created crud for functions, controller will be used to create a route, privalomas.}
+                            {--columns= : Name 3 columns to be showed. example ID,title,date, names should be the same as in DB, privalomas.}';
 
     /** The console command description. */
 
@@ -56,59 +57,96 @@ class ViewCommand extends GeneratorCommand
         'varchar' => 'text',
     ];
 
-    protected function getStub()
-    {
-        // return __DIR__ . '/Stubs/Model.stub';
-        return file_get_contents(__DIR__ .'/Stubs/Model.stub');
-    }
-
     public function handle()
     {
         $input = $this->getData();
 
-        //$filePlace = $this->getPath($input->name);
-        //if($this->alreadyExists($filePlace)) return false;
+        $indexTemplate = file_get_contents(__DIR__ .'/Stubs/index.blade.stub');
+        //$editTemplate = file_get_contents(__DIR__ .'/Stubs/edit.blade.stub');
+        //$showTemplate = file_get_contents(__DIR__ .'/Stubs/show.blade.stub');
 
-        $modelTemplate = $this->getStub();
-
-        $this->replaceName($input->name,$modelTemplate);
-        $this->putContentToFile($input->name, $modelTemplate);
-        $this->info("New model was created!");
-
+        $this->replaceName($input->name,$indexTemplate);
+        $this->replaceColumns($input->columns, $indexTemplate);
+        $this->replaceNameLowerCase($input->name, $indexTemplate);
+        $this->putContentToFile($input->name, $input->crud, $input->columns,$indexTemplate);
     }
 
     protected function getData()
     {
         $name = trim($this->argument('name-of-view'));
-        $table = trim($this->option('table'));
-        $fields = trim($this->option('fields'));
-        $relation = trim($this->option('relation'));
+        $crud = trim($this->option('crud'));
+        $columns = trim($this->option('columns'));
 
         return (object) compact(
             'name',
-            'table',
-            'fields',
-            'relation'
+            'crud',
+            'columns'
         );
     }
 
-    protected function replaceName($name, &$modelTemplate)
+    protected function replaceName($name, &$indexTemplate)
     {
-        $modelTemplate = str_replace(
-            '{{ModelTemplateClass}}',$name, $modelTemplate);
-
+        $indexTemplate = str_replace(
+            '{{ViewName}}',$name, $indexTemplate);
         return $this;
     }
 
-
-
-
-    protected function putContentToFile($name, $modelTemplate)
+    protected function replaceNameLowerCase($name, &$indexTemplate)
     {
-        if(!file_exists($path = app_path('/Models')))
-            mkdir($path, 0777, true);
-
-        file_put_contents(app_path("/Models/{$name}.php"), $modelTemplate);
+        $indexTemplate = str_replace(
+            '{{NameLowerCase}}',Str::plural(strtolower($name)), $indexTemplate);
+        return $this;
     }
 
+    protected function replaceColumns($columns, &$indexTemplate)
+    {
+        //nelabai gerai tikrint dviejose vietose ta pati, kiek parametre columns yra reiksmiu
+        $col1 = explode(',', $columns);
+        if(!empty($columns) and count($col1) == 3) {
+            for ($x = 0; $x <= 3; $x++) {
+                $col = explode(',', $columns);
+                $indexTemplate = str_replace('{{Col1}}', strtoupper($col[0]), $indexTemplate);
+                $indexTemplate = str_replace('{{Col2}}', strtoupper($col[1]), $indexTemplate);
+                $indexTemplate = str_replace('{{Col3}}', strtoupper($col[2]), $indexTemplate);
+                $indexTemplate = str_replace('{{col1}}', strtolower($col[0]), $indexTemplate);
+                $indexTemplate = str_replace('{{col2}}', strtolower($col[1]), $indexTemplate);
+                $indexTemplate = str_replace('{{col3}}', strtolower($col[2]), $indexTemplate);
+            }
+        }
+    }
+
+    protected function putContentToFile($name, $crud, $columns, &$indexTemplate)
+    {
+        $lower = Str::plural(strtolower($name));
+
+        if(!file_exists($path = base_path('/resources/views/'.$lower))) {
+            mkdir($path, 0777, true);
+            $col1 = explode(',', $columns);
+            if (count($col1) == 3) {
+                file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
+                //file_put_contents(base_path("/resources/views/show.blade.php"), $showTemplate);
+                //file_put_contents(base_path("/resources/views/form.blade.php"), $formTemplate);
+                //file_put_contents(base_path("/resources/views/edit.blade.php"), $editTemplate);
+                $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
+            } else {
+                try {
+                    return throw new Exception("You must to provide 3 names for parameter columns!");
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+            }
+
+            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'index']);\n");
+            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'show']);\n");
+            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'form']);\n");
+        }else {
+            try {
+                return throw new Exception("The views for $name already exists, see in /resources/views/{$lower} folder!");
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+    }
 }
+
+//php artisan make:view Books --crud="BooksController" --columns="id,title,date"

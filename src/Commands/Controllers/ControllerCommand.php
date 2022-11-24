@@ -3,7 +3,6 @@
 namespace adele332\crudgenerator\Commands\Controllers;
 
 use Exception;
-use Illuminate\Console\Command;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 
@@ -42,14 +41,12 @@ class ControllerCommand extends GeneratorCommand
         $controllerTemplate = $this->getStub();
 
         $this->replaceName($input->name,$controllerTemplate);
-        $this->replaceModel($input->name,$controllerTemplate);
+        $this->replaceModel($input->model,$controllerTemplate);
         $this->replaceNameInLowerCase($input->name,$controllerTemplate);
         $this->replaceNameInSingular($input->name,$controllerTemplate);
         $this->replaceNameInSingularLowerCase($input->name,$controllerTemplate);
         $this->replaceValidation($input->validate,$controllerTemplate);
         $this->putContentToFile($input->newDir, $input->name, $controllerTemplate);
-        //$this->info("New controller was created!");
-
     }
 
     protected function getData()
@@ -73,7 +70,6 @@ class ControllerCommand extends GeneratorCommand
             '{{ControllerTemplateClass}}',
             $name,
             $controllerTemplate);
-
         return $this;
     }
 
@@ -81,7 +77,6 @@ class ControllerCommand extends GeneratorCommand
     {
         $controllerTemplate = str_replace(
             '{{ModelName}}',$model, $controllerTemplate);
-
         return $this;
     }
 
@@ -91,7 +86,6 @@ class ControllerCommand extends GeneratorCommand
             '{{ControllerNameLowerCase}}',
             strtolower($name),
             $controllerTemplate);
-
         return $this;
     }
 
@@ -101,7 +95,6 @@ class ControllerCommand extends GeneratorCommand
             '{{ControllerNameSingular}}',
             Str::singular($name),
             $controllerTemplate);
-
         return $this;
     }
 
@@ -111,7 +104,6 @@ class ControllerCommand extends GeneratorCommand
             '{{ControllerNameSingularLowerCase}}',
             Str::singular(strtolower($name)),
             $controllerTemplate);
-
         return $this;
     }
 
@@ -130,7 +122,7 @@ class ControllerCommand extends GeneratorCommand
     protected function putContentToFile($newDir, $name, $controllerTemplate)
     {
         if(!file_exists($path = app_path("/Http/Controllers/{$newDir}")))
-            mkdir($path, 0777, true);   //kokiomis teisemis geriau kad kurtu?
+            mkdir($path, 0777, true);
 
         if($newDir != '') {
             $controllerTemplate = str_replace(

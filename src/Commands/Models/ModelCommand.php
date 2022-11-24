@@ -2,8 +2,8 @@
 
 namespace adele332\crudgenerator\Commands\Models;
 
-use Illuminate\Console\Command;
 use Illuminate\Console\GeneratorCommand;
+use Exception;
 
 class ModelCommand extends GeneratorCommand
 {
@@ -26,7 +26,6 @@ class ModelCommand extends GeneratorCommand
 
     protected function getStub()
     {
-       // return __DIR__ . '/Stubs/Model.stub';
         return file_get_contents(__DIR__ .'/Stubs/Model.stub');
     }
 
@@ -42,10 +41,8 @@ class ModelCommand extends GeneratorCommand
         $this->replaceName($input->name,$modelTemplate);
         $this->replaceTable($input->table, $modelTemplate);
         $this->replaceFields($input->fields, $modelTemplate);
-        $this->replaceRelation($input->name, $input->relation, $modelTemplate);
+        $this->replaceRelation($input->relation, $modelTemplate);
         $this->putContentToFile($input->name, $modelTemplate);
-        $this->info("New model was created!");
-
     }
 
     protected function getData()
@@ -67,7 +64,6 @@ class ModelCommand extends GeneratorCommand
     {
         $modelTemplate = str_replace(
         '{{ModelTemplateClass}}',$name, $modelTemplate);
-
         return $this;
     }
 
@@ -76,7 +72,6 @@ class ModelCommand extends GeneratorCommand
         $modelTemplate = str_replace('{{table}}',
             $table,
             $modelTemplate);
-
         return $this;
     }
 
@@ -85,13 +80,11 @@ class ModelCommand extends GeneratorCommand
         $modelTemplate = str_replace('{{fields}}',
             $fields,
             $modelTemplate);
-
         return $this;
     }
 
-    protected function replaceRelation($name, $relation, &$modelTemplate)
+    protected function replaceRelation($relation, &$modelTemplate)
     {
-
         $relations = explode(';', $relation);
 
         if(!empty($relation)) {
@@ -123,19 +116,16 @@ class ModelCommand extends GeneratorCommand
 
     protected function putContentToFile($name, $modelTemplate)
     {
-        if(!file_exists($path = app_path('/Models')))
-            mkdir($path, 0777, true);
-
-        file_put_contents(app_path("/Models/{$name}.php"), $modelTemplate);
+        if(!file_exists($path = app_path("/Models/{$name}.php"))){
+            //mkdir($path, 0777, true);
+            file_put_contents(app_path("/Models/{$name}.php"), $modelTemplate);
+            $this->info("New model was created!");
+        }else{
+            try {
+                return throw new Exception("Model $name already exists!");
+            } catch(Exception $e) {
+                echo $e->getMessage();
+            }
+        }
     }
-
-    /*
-    protected function getPath($name)
-    {
-        $path = app_path();
-        $path = $path . '/' . $name . ".php";
-        return $path;
-    }
-    */
-
 }
