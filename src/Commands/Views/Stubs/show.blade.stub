@@ -4,24 +4,13 @@
         <div class="card-header">
         </div>
         <div class="card-body">
-            <a href="{{ url('/{{NameLowerCase}}/'.$genre->id.'/edit') }}" class="btn btn-primary" style="float: left;">Edit</a>
+            <a href="{{ url('/admin/{{NameLowerCase}}/'.${{ModelName}}->id.'/edit')}}" class="btn btn-primary" style="float: left;">Edit</a>
             <br>
             <br>
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <tbody>
-                    @foreach(${{NameLowerCase}} as $item)
-                        <td>Stulpelio pavadinimas</td>
-                        <td>{{ $genre->id }}</td>
-                    @endforeach
-                    <tr>
-                        <td>ID</td>
-                        <td>{{ $genre->id }}</td>
-                    </tr>
-                    <tr>
-                        <td>Title</td>
-                        <td>{{ $genre->title }}</td>
-                    </tr>
+                        {{bodyShow}}
                     </tbody>
                 </table>
             </div>

@@ -17,7 +17,8 @@ class CrudGeneratorServiceProvider extends ServiceProvider
             ['adele332\crudgenerator\Commands\Models\ModelCommand',
                 'adele332\crudgenerator\Commands\Controllers\ControllerCommand',
                 'adele332\crudgenerator\Commands\Views\ViewCommand',
-                'adele332\crudgenerator\Commands\Main\MainViewCommand'];
+                'adele332\crudgenerator\Commands\Main\MainViewCommand',
+                'adele332\crudgenerator\Commands\Migrations\MigrationCommand'];
 
         $this->commands($commands);
     }

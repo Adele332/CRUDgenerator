@@ -3,9 +3,9 @@
 namespace adele332\crudgenerator\Commands\Views;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\Schema;
 
 class ViewCommand extends Command
 {
@@ -15,9 +15,10 @@ class ViewCommand extends Command
      */
 
     protected $signature = 'make:view
-                            {name-of-view : The name of newly created view. example Genres}
-                            {--crud= : Name of created crud for functions, controller will be used to create a route, privalomas.}
-                            {--columns= : Name 3 columns to be showed. example ID,title,date, names should be the same as in DB, privalomas.}';
+                            {name-of-view : The name of newly created view, example Genres. PRIVALOMAS}
+                            {--crud= : Name of created crud for functions, controller will be used to create a route, please provide full name. PRIVALOMAS}
+                            {--table= : Name of the database table. PRIVALOMAS}
+                            {--columns= : Names of 3 columns to be showed in general table, names should be the same as in DB. Example ID,title,date. PRIVALOMAS}';
 
     /** The console command description. */
 
@@ -31,7 +32,7 @@ class ViewCommand extends Command
         'boolean' => 'radio',
         'char' => 'text',
         'date' => 'date',
-        'datetime' => 'datetime-local',
+        'datetime' => 'datetime',
         'decimal' => 'number',
         'double' => 'number',
         'email' => 'email',
@@ -52,7 +53,7 @@ class ViewCommand extends Command
         'select' => 'select',
         'text' => 'textarea',
         'tinyint' => 'number',
-        'timestamp' => 'datetime-local',
+        'timestamp' => 'datetime',
         'time' => 'time',
         'varchar' => 'text',
     ];
@@ -62,24 +63,33 @@ class ViewCommand extends Command
         $input = $this->getData();
 
         $indexTemplate = file_get_contents(__DIR__ .'/Stubs/index.blade.stub');
-        //$editTemplate = file_get_contents(__DIR__ .'/Stubs/edit.blade.stub');
-        //$showTemplate = file_get_contents(__DIR__ .'/Stubs/show.blade.stub');
+        $formTemplate = file_get_contents(__DIR__ .'/Stubs/form.blade.stub');
+        $showTemplate = file_get_contents(__DIR__ .'/Stubs/show.blade.stub');
+
 
         $this->replaceName($input->name,$indexTemplate);
         $this->replaceColumns($input->columns, $indexTemplate);
         $this->replaceNameLowerCase($input->name, $indexTemplate);
-        $this->putContentToFile($input->name, $input->crud, $input->columns,$indexTemplate);
+        $this->replaceNameLowerCase($input->name, $showTemplate);
+        $this->replaceShowBody($input->dbTable, $showTemplate);
+        $this->replaceModel($input->dbTable, $showTemplate);
+        $this->replaceModel($input->dbTable, $formTemplate);
+        $this->replacePluralName($input->dbTable, $formTemplate);
+        $this->replaceFormFields($input->dbTable, $formTemplate);
+        $this->putContentToFile($input->name, $input->crud, $input->columns, $indexTemplate, $showTemplate, $formTemplate);
     }
 
     protected function getData()
     {
         $name = trim($this->argument('name-of-view'));
         $crud = trim($this->option('crud'));
+        $dbTable = trim($this->option('table'));
         $columns = trim($this->option('columns'));
 
         return (object) compact(
             'name',
             'crud',
+            'dbTable',
             'columns'
         );
     }
@@ -88,6 +98,20 @@ class ViewCommand extends Command
     {
         $indexTemplate = str_replace(
             '{{ViewName}}',$name, $indexTemplate);
+        return $this;
+    }
+
+    protected function replaceModel($dbTable, &$formTemplate)
+    {
+        $formTemplate = str_replace(
+            '{{ModelName}}',Str::singular(strtolower($dbTable)), $formTemplate);
+        return $this;
+    }
+
+    protected function replacePluralName($dbTable, &$formTemplate)
+    {
+        $formTemplate = str_replace(
+            '{{PluralNameLower}}',Str::plural(strtolower($dbTable)), $formTemplate);
         return $this;
     }
 
@@ -115,7 +139,63 @@ class ViewCommand extends Command
         }
     }
 
-    protected function putContentToFile($name, $crud, $columns, &$indexTemplate)
+    protected function replaceShowBody($dbTable, &$showTemplate){
+        $columns = Schema::getColumnListing($dbTable);
+        $rows = [];
+        //echo $dbTable;
+        foreach ($columns as $item) {
+            $rows[$item] = "<tr>
+                            <td>".$item."</td>
+                            <td> {{ $".Str::singular($dbTable)."->".$item." }} </td>
+                        </tr>";
+        }
+
+        if (!empty($rows)) {
+            $showTemplate = str_replace(
+                '{{bodyShow}}',  implode($rows), $showTemplate);
+        } else {
+            try {
+                return throw new Exception("Provided database table name do not exists in DB!");
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                exit(1);
+            }
+        }
+    }
+
+    protected function replaceFormFields($dbTable, &$formTemplate){
+
+            $columns = Schema::getColumnListing($dbTable);
+            $fieldRows = [];
+            foreach ($columns as $item) {
+                $type = Schema::getColumnType($dbTable, $item);
+                $typeToUse = $this->typeOfFields[$type];
+                //echo $typeToUse;
+                $fieldRows[$item] = "
+            <div class=\"form-group\">
+                {!! Form::label('".$item."', '".$item.": ', ['class' => 'col-sm-3']) !!}
+                    <div class=\"col-sm-6\">
+                        {!! Form::".$typeToUse."('".$item."', null, ['class' => 'form-control', 'required' => 'required']) !!}
+                    </div>
+            </div>
+            ";
+            }
+
+        if (!empty($fieldRows)) {
+            $formTemplate = str_replace(
+                '{{inputFields}}',  implode($fieldRows), $formTemplate);
+        } else {
+            try {
+                return throw new Exception("Provided database table name do not exists in DB!");
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                exit(1);
+            }
+        }
+    }
+
+
+    protected function putContentToFile($name, $crud, $columns, &$indexTemplate, &$showTemplate, &$formTemplate)
     {
         $lower = Str::plural(strtolower($name));
 
@@ -124,9 +204,8 @@ class ViewCommand extends Command
             $col1 = explode(',', $columns);
             if (count($col1) == 3) {
                 file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
-                //file_put_contents(base_path("/resources/views/show.blade.php"), $showTemplate);
-                //file_put_contents(base_path("/resources/views/form.blade.php"), $formTemplate);
-                //file_put_contents(base_path("/resources/views/edit.blade.php"), $editTemplate);
+                file_put_contents(base_path("/resources/views/{$lower}/show.blade.php"), $showTemplate);
+                file_put_contents(base_path("/resources/views/{$lower}/form.blade.php"), $formTemplate);
                 $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
             } else {
                 try {
@@ -136,9 +215,9 @@ class ViewCommand extends Command
                 }
             }
 
-            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'index']);\n");
-            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'show']);\n");
-            File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'form']);\n");
+            //File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'index']);\n");
+            //File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'show']);\n");
+            //File::append(base_path('routes/web.php'), "Route::get('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class, 'form']);\n");
         }else {
             try {
                 return throw new Exception("The views for $name already exists, see in /resources/views/{$lower} folder!");
@@ -148,5 +227,3 @@ class ViewCommand extends Command
         }
     }
 }
-
-//php artisan make:view Books --crud="BooksController" --columns="id,title,date"

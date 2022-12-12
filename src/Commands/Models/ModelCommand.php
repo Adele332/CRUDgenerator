@@ -13,10 +13,10 @@ class ModelCommand extends GeneratorCommand
      */
 
     protected $signature = 'make:model
-                            {name-of-model : The name of newly created model.}
-                            {--table= : Name of the table in database.}
-                            {--fields= : Columns names in newly created table.}
-                            {--relation= : The relationships between models.}';
+                            {name-of-model : The name of newly created model. PRIVALOMAS}
+                            {--table= : Name of the table in database. PRIVALOMAS}
+                            {--fields= : Columns names in newly created table. PRIVALOMAS}
+                            {--relation= : The relationships between models. PASIRENKAMAS}';
 
     /** The console command description. */
 

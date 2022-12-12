@@ -65,19 +65,7 @@
                     <div class="card-body">
                         <ul class="nav flex-column" role="tablist">
                             <li class="nav-item" role="presentation">
-
-                            <?php
-                                function allList(){
-                            $dir = new DirectoryIterator(base_path("/resources/views/"));
-                            foreach ($dir as $fileinfo) {
-                                if ($fileinfo->isDir() && !$fileinfo->isDot()) {
-                                    $list = $fileinfo->getFilename();
-                                    echo '<a class="nav-link" href="/admin/'.$list.'"  style="text-transform:uppercase;">'.$list.'</a>';
-                                }
-                            }
-                            }
-                            ?>
-                                <p> <?php allList(); ?></p>
+                                <p>{{ allList()}}</p>
                             </li>
                         </ul>
                     </div>
@@ -99,4 +87,14 @@
 </div>
 </body>
 </html>
-
+@php
+    function allList(){
+        $dir = new DirectoryIterator(base_path("/resources/views/"));
+        foreach ($dir as $fileinfo) {
+            if ($fileinfo->isDir() && !$fileinfo->isDot()) {
+                $list = $fileinfo->getFilename();
+                echo '<a class="nav-link" href="/admin/'.$list.'"  style="text-transform:uppercase;">'.$list.'</a>';
+            }
+        }
+    };
+@endphp

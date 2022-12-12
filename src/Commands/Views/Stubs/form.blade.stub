@@ -1,0 +1,31 @@
+@extends('layout')
+
+@section('content')
+    <div class="card-header">
+        @if(isset(${{ModelName}}))
+            Edit existing {{ModelName}}
+        @else
+            Create new {{ModelName}}
+        @endif
+    </div>
+
+        <div class="card-body">
+
+            {{-- Form::model ir Form::open metodai automatiškai prideda prie formos CSRF žetoną, todėl atskirai jo aprašyti nereikia --}}
+            @if(isset(${{ModelName}}))
+                {{-- Eamo įrašo redagavimo forma --}}
+                {!! Form::model(${{ModelName}}, ['url' => ['admin/{{PluralNameLower}}', ${{ModelName}}->id], 'method' => 'patch']) !!}
+            @else
+                {{-- Naujo įrašo įvedimo forma; metodo nereikia nurodyti, nes pagal nutylėjimą jis yra 'post' --}}
+                {!! Form::open(['url' => 'admin/{{PluralNameLower}}', 'method' => 'post']) !!}
+            @endif
+            {{inputFields}}
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-3" style="float: right;">
+                    {!! Form::submit('Save', ['class' => 'btn btn-primary form-control']) !!}
+                </div>
+            </div>
+            {!! Form::close() !!}
+        </div>
+
+@endsection
