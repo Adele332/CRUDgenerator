@@ -16,7 +16,7 @@
     "minimum-stability": "dev",
     "require": {
         "laravelcollective/html": "^5.5|^6.0|^7.0",
-        "doctrine/dba": "*",
+        "doctrine/dba": "^2.5",
         "laravel/jetstream": "*"
     }
 }
