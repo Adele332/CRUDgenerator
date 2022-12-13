@@ -23,6 +23,6 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "doctrine/dba": "^3.5"
+        "doctrine/dba": "3.4"
     }
 }
