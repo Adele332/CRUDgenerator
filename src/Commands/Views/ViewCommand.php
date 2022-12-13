@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\File;
 
 class ViewCommand extends Command
 {
@@ -16,7 +17,7 @@ class ViewCommand extends Command
 
     protected $signature = 'make:view
                             {name-of-view : The name of newly created view, example Genres. PRIVALOMAS}
-                            {--crud= : Name of created crud for functions, controller will be used to create a route, please provide full name. PRIVALOMAS}
+                            {--crud= : Name of the controller to get crud functionality, will be used to create a route, please provide full name. PRIVALOMAS}
                             {--table= : Name of the database table. PRIVALOMAS}
                             {--columns= : Names of 3 columns to be showed in general table, names should be the same as in DB. Example ID,title,date. PRIVALOMAS}';
 
@@ -127,7 +128,7 @@ class ViewCommand extends Command
         //nelabai gerai tikrint dviejose vietose ta pati, kiek parametre columns yra reiksmiu
         $col1 = explode(',', $columns);
         if(!empty($columns) and count($col1) == 3) {
-            for ($x = 0; $x <= 3; $x++) {
+            for ($x = 0; $x == 3; $x++) {
                 $col = explode(',', $columns);
                 $indexTemplate = str_replace('{{Col1}}', strtoupper($col[0]), $indexTemplate);
                 $indexTemplate = str_replace('{{Col2}}', strtoupper($col[1]), $indexTemplate);
@@ -155,7 +156,7 @@ class ViewCommand extends Command
                 '{{bodyShow}}',  implode($rows), $showTemplate);
         } else {
             try {
-                return throw new Exception("Provided database table name do not exists in DB!");
+                return throw new Exception("Provided database table name do not exists in DB or you didn't used parameter --table!");
             } catch (Exception $e) {
                 echo $e->getMessage();
                 exit(1);
@@ -200,13 +201,22 @@ class ViewCommand extends Command
         $lower = Str::plural(strtolower($name));
 
         if(!file_exists($path = base_path('/resources/views/'.$lower))) {
-            mkdir($path, 0777, true);
             $col1 = explode(',', $columns);
             if (count($col1) == 3) {
-                file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
-                file_put_contents(base_path("/resources/views/{$lower}/show.blade.php"), $showTemplate);
-                file_put_contents(base_path("/resources/views/{$lower}/form.blade.php"), $formTemplate);
-                $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
+                if(!empty($crud)) {
+                    mkdir($path, 0777, true);
+                    file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
+                    file_put_contents(base_path("/resources/views/{$lower}/show.blade.php"), $showTemplate);
+                    file_put_contents(base_path("/resources/views/{$lower}/form.blade.php"), $formTemplate);
+                    File::append(base_path('routes/web.php'), "Route::resource('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class]);\n");
+                    $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
+                }else {
+                    try {
+                        return throw new Exception("Please use parameter --crud!");
+                    } catch (Exception $e) {
+                        echo $e->getMessage();
+                    }
+                }
             } else {
                 try {
                     return throw new Exception("You must to provide 3 names for parameter columns!");

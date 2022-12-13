@@ -14,7 +14,7 @@ class MigrationCommand extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:migrations
-                            {name : Name of newly created migration, provide full name (example Genres).}
+                            {name : Name of newly created migration, provide name for what DB table will be created (example Genres).}
                             {--table-schema= : Database table schema.}
                             {--foreign= : Foreign keys seperated by ",". example - foreign(\'game_id\')->references(\'id\')->on(\'low_games\')->onDelete(\'cascade\')}';
 
@@ -74,7 +74,7 @@ class MigrationCommand extends GeneratorCommand
     protected function replaceSchemaUp($schema, $name, $foreign, &$migrationTemplate)
     {
        // --schema="name:string, quantity:integer, price:float, userId:integer"
-       // php artisan make:migrations Books --table-schema="name:string,quantity:integer,price:float" --foreign="dada"
+       // php artisan make:migrations Games --table-schema="name:string,quantity:integer,price:float,genre_id:foreignId" --foreign="genre_id,id,genres"
 
         $schemaField = explode(',', $schema);
 
@@ -82,11 +82,18 @@ class MigrationCommand extends GeneratorCommand
             foreach ($schemaField as $schema) {
                 $schemaArray = explode(':', $schema);
                 if (count($schemaArray) >= 2) {
-                    $function[$schema] = "\$table->" . $schemaArray[1] . "('" . $schemaArray[0] . "')->nullable();
+                    if(!empty($schemaArray[0]) and !empty($schemaArray[1])) {
+                        $function[$schema] = "\$table->" . $schemaArray[1] . "('" . $schemaArray[0] . "')->nullable();
                 ";
+                    }else{try {
+                        return throw new Exception("Please provided schema fields with name and type! For example: --schema=\"name:string\"");
+                    } catch (Exception $e) {
+                        echo $e->getMessage();
+                        exit(1);
+                    }}
                 }else {
                     try {
-                        return throw new Exception("Please provided at least one schema with name and type! For example: --schema=\"name:string\"");
+                        return throw new Exception("Please provided schema fields with name and type! For example: --schema=\"name:string\"");
                     } catch (Exception $e) {
                         echo $e->getMessage();
                         exit(1);
