@@ -1,7 +1,6 @@
 {
     "name": "adele332/crudgenerator",
     "description": "CRUD generator for Laravel framework",
-    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Adele332\\Crudgenerator\\": "src/"
@@ -13,6 +12,14 @@
             "email": "adele.zybailaite@mif.stud.vu.lt"
         }
     ],
+    "extra": {
+        "laravel": {
+            "providers":
+            [
+                "adele332\\Crudgenerator\\crudGeneratorServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev",
     "require": {
         "laravelcollective/html": "^5.5|^6.0|^7.0",
