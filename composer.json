@@ -16,7 +16,7 @@
         "laravel": {
             "providers":
             [
-                "adele332\\Crudgenerator\\crudGeneratorServiceProvider"
+                "adele332\\Crudgenerator\\CrudGeneratorServiceProvider"
             ]
         }
     },
