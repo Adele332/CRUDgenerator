@@ -4,7 +4,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Adele332\\Crudgenerator\\": "src/"
+            "adele332\\crudgenerator\\": "src/"
         }
     },
     "authors": [
@@ -13,6 +13,14 @@
             "email": "adele.zybailaite@mif.stud.vu.lt"
         }
     ],
+    "extra": {
+        "laravel": {
+            "providers":
+            [
+                "adele332\\crudgenerator\\CrudGeneratorServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev",
     "require": {}
 }
