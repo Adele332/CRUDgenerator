@@ -208,7 +208,7 @@ class ViewCommand extends Command
                     file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
                     file_put_contents(base_path("/resources/views/{$lower}/show.blade.php"), $showTemplate);
                     file_put_contents(base_path("/resources/views/{$lower}/form.blade.php"), $formTemplate);
-                    File::append(base_path('routes/web.php'), "Route::resource('/admin/{$lower}', [App\Http\Controllers\Admin\\$crud::class]);\n");
+                    File::append(base_path('routes/web.php'), "Route::resource('admin/{$lower}', App\Http\Controllers\Admin\\$crud::class);\n");
                     $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
                 }else {
                     try {
@@ -236,4 +236,5 @@ class ViewCommand extends Command
             }
         }
     }
+
 }

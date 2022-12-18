@@ -110,7 +110,7 @@ class ControllerCommand extends GeneratorCommand
     protected function replaceValidation($validate, &$controllerTemplate)
     {
         if($validate != '') {
-            $validateStruct = "\$this->validate(\$request, [" . $validate . "]);\n";
+            $validateStruct = "\$request->validate( [" . $validate . "]);\n";
             $controllerTemplate = str_replace('{{validationFields}}', $validateStruct, $controllerTemplate);
         }else{
             $controllerTemplate = str_replace(

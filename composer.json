@@ -23,6 +23,7 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "doctrine/dbal": "*"
+        "doctrine/dbal": "*",
+        "laravelcollective/html": "*"
     }
 }

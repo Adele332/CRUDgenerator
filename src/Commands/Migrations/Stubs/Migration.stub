@@ -27,4 +27,4 @@ class Create{{MigrationName}}Table extends Migration
         {{schemaDown}}
     }
 
-}
+};

@@ -15,7 +15,7 @@ class {{ControllerTemplateClass}}Controller extends Controller
      */
     public function index()
     {
-        ${{ControllerNameLowerCase}} = {{ModelName}}::all();
+        ${{ControllerNameLowerCase}} = {{ModelName}}::simplePaginate(5);
         return view('admin.{{ControllerNameLowerCase}}.index', compact('{{ControllerNameLowerCase}}'));
     }
 

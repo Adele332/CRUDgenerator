@@ -9,7 +9,7 @@ class ModelCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
-     * * @var string
+     * * @var strin
      */
 
     protected $signature = 'make:model

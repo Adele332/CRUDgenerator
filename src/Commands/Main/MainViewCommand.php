@@ -34,6 +34,7 @@ class MainViewCommand extends GeneratorCommand
         $mainTemplate = $this->getStub();
 
         $this->replaceName($input->name,$mainTemplate);
+        $this->add();
         $this->putContentToFile($mainTemplate);
     }
 
@@ -78,5 +79,25 @@ class MainViewCommand extends GeneratorCommand
             $this->info("You can view it no http://127.0.0.1:8000/admin");
             $this->info("Do not forget to run 'php artisan serve' command first!");
         }
+    }
+
+    public function add()
+    {
+        $f = fopen(app_path("/Http/Kernel.php"), "r+");
+
+        $oldstr = file_get_contents(app_path("/Http/Kernel.php"));
+        $str_to_insert = "  'crudAuth' => \App\Http\Middleware\AuthCheck::class,
+        ";
+        $specificLine = "protected \$routeMiddleware = [";
+
+        while (($buffer = fgets($f)) !== false) {
+            if (str_contains($buffer, $specificLine)) {
+                $pos = ftell($f);
+                $newstr = substr_replace($oldstr, $str_to_insert, $pos, 0);
+                file_put_contents(app_path("/Http/Kernel.php"), $newstr);
+                break;
+            }
+        }
+        fclose($f);
     }
 }
