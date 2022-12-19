@@ -5,6 +5,8 @@ namespace App\Http\Controllers{{DirectoryName}};
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\{{ModelName}};
+use App\Models\Cruduser;
+use Illuminate\Support\Facades\Session;
 
 class {{ControllerTemplateClass}}Controller extends Controller
 {
@@ -16,7 +18,8 @@ class {{ControllerTemplateClass}}Controller extends Controller
     public function index()
     {
         ${{ControllerNameLowerCase}} = {{ModelName}}::simplePaginate(5);
-        return view('admin.{{ControllerNameLowerCase}}.index', compact('{{ControllerNameLowerCase}}'));
+        $data = Cruduser::where('id','=',Session::get('loginId'))->first();
+        return view('crudViews.{{ControllerNameLowerCase}}.index', compact('{{ControllerNameLowerCase}}','data'));
     }
 
     /**
@@ -26,7 +29,8 @@ class {{ControllerTemplateClass}}Controller extends Controller
      */
     public function create()
     {
-        return view('admin.{{ControllerNameLowerCase}}.form');
+        $data = Cruduser::where('id','=',Session::get('loginId'))->first();
+        return view('crudViews.{{ControllerNameLowerCase}}.form',compact('data'));
     }
 
     /**
@@ -52,7 +56,8 @@ class {{ControllerTemplateClass}}Controller extends Controller
     public function show($id)
     {
         ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
-        return view('admin.{{ControllerNameLowerCase}}.show', compact('{{ControllerNameSingularLowerCase}}'));
+        $data = Cruduser::where('id','=',Session::get('loginId'))->first();
+        return view('crudViews.{{ControllerNameLowerCase}}.show', compact('{{ControllerNameSingularLowerCase}}','data'));
     }
 
     /**
@@ -64,7 +69,8 @@ class {{ControllerTemplateClass}}Controller extends Controller
     public function edit($id)
     {
         ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
-        return view('admin.{{ControllerNameLowerCase}}.form', compact('{{ControllerNameSingularLowerCase}}'));
+        $data = Cruduser::where('id','=',Session::get('loginId'))->first();
+        return view('crudViews.{{ControllerNameLowerCase}}.form', compact('{{ControllerNameSingularLowerCase}}','data'));
     }
 
     /**

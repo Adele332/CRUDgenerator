@@ -16,14 +16,13 @@
 <div id="app">
     <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
         <div class="container">
-            <a class="navbar-brand" href="/admin">
+            <a class="navbar-brand" href="/crud">
                 Laravel
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav mr-auto">
                     <li>CRUD</li>
@@ -31,33 +30,27 @@
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ml-auto">
                     <!-- Authentication Links -->
-                    <h6>Welcome {{$data->name}}! <br> <a href="/logout">Logout</a></h6>
+                    <p><a href="login">Login</a> / <a href="registration"> Register</a></p>
                 </ul>
-
             </div>
         </div>
     </nav>
-
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-header">
-                        {{NameOfDB}} Database
-                    </div>
-                    <div class="card-body">
-                        <ul class="nav flex-column" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <p>{{ allList()}}</p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <br/>
-            </div>
+            <div class="col-md-3"></div>
             <div class="col-md-9">
                 <div class="card">
-                    @yield('content')
+                    <div class="card-header">Welcome to your CRUD generator!</div>
+                    <div class="card-body">
+                        Main steps to access data management:
+                        <ul>
+                            <li>If you do not have an account please register.</li>
+                            <li>Log in to your account.</li>
+                            <li>If you login as simple user you will be able only to view data.</li>
+                            <li>If you login as administrator you will be able to manage all data.</li>
+                            <li>Enjoy using your CRUD generator.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,14 +63,3 @@
 </div>
 </body>
 </html>
-@php
-    function allList(){
-        $dir = new DirectoryIterator(base_path("/resources/views/crudViews/"));
-        foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDir() && !$fileinfo->isDot()) {
-                $list = $fileinfo->getFilename();
-                echo '<a class="nav-link" href="/admin/'.$list.'"  style="text-transform:uppercase;">'.$list.'</a>';
-            }
-        }
-    };
-@endphp

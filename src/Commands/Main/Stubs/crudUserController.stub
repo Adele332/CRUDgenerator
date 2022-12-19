@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Cruduser;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+
+
+class CrudUserController extends Controller
+{
+    public function login()
+    {
+        return view("login");
+    }
+
+    public function registration()
+    {
+        return view("registration");
+    }
+
+    public function registerUser(Request $request)
+    {
+        $request->validate([
+            'name'=>'required',
+            'email'=>'required|email|unique:crudusers',
+            'password'=>'required|min:8|max:15'
+        ]);
+
+        $crudusers = new Cruduser();
+        $crudusers->name = $request->name;
+        $crudusers->email = $request->email;
+        $crudusers->password = Hash::make($request->password);
+        $res = $crudusers->save();
+
+        if($res){
+            return back()->with('success','You registered successfully!');
+        }else{
+            return back()->with('fail','Something went wrong!');
+        }
+
+    }
+
+    public function loginUser(Request $request)
+    {
+        $request->validate([
+            'email'=>'required|email',
+            'password'=>'required|min:8|max:15'
+        ]);
+
+        $cruduser = Cruduser::where('email','=',$request->email)->first();
+
+        if($cruduser){
+            if(Hash::check($request->password, $cruduser->password))
+            {
+                $request->session()->put('loginId',$cruduser->id);
+                return redirect('admin');
+
+            }else{
+                return back()->with('fail','Password do not matches!');
+            }
+
+        }else{
+            return back()->with('fail','This email is not registered!');
+        }
+    }
+
+    public function layout()
+    {
+        $data = array();
+        if(Session::has('loginId'))
+        {
+            $data = Cruduser::where('id','=',Session::get('loginId'))->first();
+        }
+        return view('extendLayout', compact('data'));
+    }
+
+    public function logout()
+    {
+        if(Session::has('loginId')){
+            Session::pull('loginId');
+            return redirect('crud');
+        }
+    }
+}

@@ -4,16 +4,10 @@
 
     <div class="card-header">{{ViewName}}</div>
     <div class="card-body">
-        @if(Session::has('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ Session::get('success') }}
-                    @php
-                        Session::forget('success');
-                    @endphp
-            </div>
-        @endif
+        @if($data->isAdmin == 1)
         <a href="{{ url('admin/{{NameLowerCase}}/create') }}" class="btn btn-success btn-sm" style="float: right;">Add genre</a>
         <br>
+        @endif
         <br>
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -33,10 +27,12 @@
                     <td>{{ $item->{{col3}} }}</td>
                     <td>
                         <a href="{{ url('admin/{{NameLowerCase}}/'.$item->id) }}" > <button class="btn btn-info btn-sm">View</button></a>
+                        @if($data->isAdmin == 1)
                         <a href="{{ url('/admin/{{NameLowerCase}}/'.$item->id.'/edit')}}" > <button class="btn btn-primary btn-sm">Edit</button></a>
                         {!! Form::open(['method'=>'DELETE', 'url' => ['admin/{{NameLowerCase}}', $item->id], 'style' => 'display:inline']) !!}
                         {!! Form::button('<i class="fas fa-trash-alt"></i> Delete', ['class' => 'btn btn-danger btn-sm', 'type' => 'submit']) !!}
                         {!! Form::close() !!}
+                        @endif
                     </td>
                 </tr>
                 @endforeach

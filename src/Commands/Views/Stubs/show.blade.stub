@@ -4,8 +4,10 @@
         <div class="card-header">
         </div>
         <div class="card-body">
+            @if($data->isAdmin == 1)
             <a href="{{ url('/admin/{{NameLowerCase}}/'.${{ModelName}}->id.'/edit')}}" class="btn btn-primary" style="float: left;">Edit</a>
             <br>
+            @endif
             <br>
             <div class="table-responsive">
                 <table class="table table-bordered">

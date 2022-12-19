@@ -128,7 +128,7 @@ class ViewCommand extends Command
         //nelabai gerai tikrint dviejose vietose ta pati, kiek parametre columns yra reiksmiu
         $col1 = explode(',', $columns);
         if(!empty($columns) and count($col1) == 3) {
-            for ($x = 0; $x == 3; $x++) {
+            for ($x = 0; $x <= count($col1); $x++) {
                 $col = explode(',', $columns);
                 $indexTemplate = str_replace('{{Col1}}', strtoupper($col[0]), $indexTemplate);
                 $indexTemplate = str_replace('{{Col2}}', strtoupper($col[1]), $indexTemplate);
@@ -169,7 +169,9 @@ class ViewCommand extends Command
             $columns = Schema::getColumnListing($dbTable);
             $fieldRows = [];
             foreach ($columns as $item) {
-                $type = Schema::getColumnType($dbTable, $item);
+                //for ($item="id"; $item<=count($columns); $item) {
+
+                    $type = Schema::getColumnType($dbTable, $item);
                 $typeToUse = $this->typeOfFields[$type];
                 //echo $typeToUse;
                 $fieldRows[$item] = "
@@ -200,21 +202,26 @@ class ViewCommand extends Command
     {
         $lower = Str::plural(strtolower($name));
 
-        if(!file_exists($path = base_path('/resources/views/'.$lower))) {
+        if(!file_exists($path = base_path('/resources/views/crudViews'))) {
+            mkdir($path, 0777, true);
+        }
+
+            if(!file_exists($path = base_path('/resources/views/crudViews/'.$lower))) {
             $col1 = explode(',', $columns);
             if (count($col1) == 3) {
                 if(!empty($crud)) {
                     mkdir($path, 0777, true);
-                    file_put_contents(base_path("/resources/views/{$lower}/index.blade.php"), $indexTemplate);
-                    file_put_contents(base_path("/resources/views/{$lower}/show.blade.php"), $showTemplate);
-                    file_put_contents(base_path("/resources/views/{$lower}/form.blade.php"), $formTemplate);
+                    file_put_contents(base_path("/resources/views/crudViews/{$lower}/index.blade.php"), $indexTemplate);
+                    file_put_contents(base_path("/resources/views/crudViews/{$lower}/show.blade.php"), $showTemplate);
+                    file_put_contents(base_path("/resources/views/crudViews/{$lower}/form.blade.php"), $formTemplate);
                     File::append(base_path('routes/web.php'), "Route::resource('admin/{$lower}', App\Http\Controllers\Admin\\$crud::class);\n");
-                    $this->info("New views were created! Saved in /resources/views/{$lower} directory!");
+                    $this->info("New views were created! Saved in /resources/views/crudViews/{$lower} directory!");
                 }else {
                     try {
                         return throw new Exception("Please use parameter --crud!");
                     } catch (Exception $e) {
                         echo $e->getMessage();
+                        exit(1);
                     }
                 }
             } else {
@@ -222,6 +229,7 @@ class ViewCommand extends Command
                     return throw new Exception("You must to provide 3 names for parameter columns!");
                 } catch (Exception $e) {
                     echo $e->getMessage();
+                    exit(1);
                 }
             }
 
@@ -233,6 +241,7 @@ class ViewCommand extends Command
                 return throw new Exception("The views for $name already exists, see in /resources/views/{$lower} folder!");
             } catch (Exception $e) {
                 echo $e->getMessage();
+                exit(1);
             }
         }
     }
