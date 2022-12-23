@@ -98,7 +98,7 @@ class {{ControllerTemplateClass}}Controller extends Controller
     public function destroy($id)
     {
         ${{ControllerNameSingularLowerCase}} = {{ModelName}}::findOrFail($id);
-        ${{ControllerNameSingularLowerCase}}->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
+        ${{ControllerNameSingularLowerCase}}->delete();
         return redirect('admin/{{ControllerNameLowerCase}}')->with('success', '{{ControllerNameSingular}} deleted successfully.');
     }
 }

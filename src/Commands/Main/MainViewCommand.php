@@ -5,8 +5,6 @@ namespace adele332\crudgenerator\Commands\Main;
 use Exception;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class MainViewCommand extends GeneratorCommand
 {
@@ -14,7 +12,7 @@ class MainViewCommand extends GeneratorCommand
      * The name and signature of the console command.
      * * @var string
      */
-
+// php artisan make:main Test
     protected $signature = 'make:main
                             {name : The name of main layout (best to provide your DB name).}';
 
@@ -32,19 +30,16 @@ class MainViewCommand extends GeneratorCommand
     public function handle()
     {
         $input = $this->getData();
-
         $mainTemplate = $this->getStub();
 
         $path = __DIR__ . '/..';
         $migrationTemplate = file_get_contents($path.'/Migrations/Stubs/Migration.stub');
         $modelTemplate = file_get_contents($path.'/Models/Stubs/Model.stub');
-        $crudAuthTemplate = file_get_contents(__DIR__.'Stubs/middlewares.stub');
-        $sessionAuthTemplate = file_get_contents(__DIR__.'Stubs/middlewares.stub');
-
-
+        $crudAuthTemplate = file_get_contents(__DIR__.'/Stubs/middlewares.stub');
+        $sessionAuthTemplate = file_get_contents(__DIR__.'/Stubs/middlewares.stub');
 
         $this->replaceName($input->name,$mainTemplate);
-        //$this->add();
+        $this->addToKernel();
         $this->crudUserMigration($migrationTemplate);
         $this->crudUserModel($modelTemplate);
         $this->middlewareCrudAuth($crudAuthTemplate);
@@ -68,7 +63,7 @@ class MainViewCommand extends GeneratorCommand
         return $this;
     }
 
-    public function crudUserMigration(&$migrationTemplate){
+    protected function crudUserMigration(&$migrationTemplate){
 
         $drop = "Schema::dropIfExists('crudusers');";
         $schema = "
@@ -108,10 +103,9 @@ class MainViewCommand extends GeneratorCommand
 
         $migrationTemplate = str_replace(
             '{{schemaOfTable}}',$schema, $migrationTemplate);
-
     }
 
-    public function crudUserModel(&$modelTemplate){
+    protected function crudUserModel(&$modelTemplate){
 
         $modelTemplate = str_replace(
             '{{ModelTemplateClass}}','Cruduser', $modelTemplate);
@@ -126,7 +120,7 @@ class MainViewCommand extends GeneratorCommand
             '{{relation}}','', $modelTemplate);
     }
 
-    public function middlewareCrudAuth(&$crudAuthTemplate){
+    protected function middlewareCrudAuth(&$crudAuthTemplate){
 
         $crudAuthTemplate = str_replace(
             '{{ClassName}}','AuthCheck', $crudAuthTemplate);
@@ -142,13 +136,13 @@ class MainViewCommand extends GeneratorCommand
             '{{Condition}}',$condition, $crudAuthTemplate);
     }
 
-    public function middlewareSessionAuth(&$sessionAuthTemplate){
+    protected function middlewareSessionAuth(&$sessionAuthTemplate){
 
         $sessionAuthTemplate = str_replace(
             '{{ClassName}}','SessionCheck', $sessionAuthTemplate);
 
         $condition = '
-        if(Session::has(\'loginId\') && (url(\'login\')==$request->url() || url(\'registration\') == $request->url())){
+        if(Session::has(\'loginId\') && (url(\'login\')==$request->url() || url(\'crud\')==$request->url() || url(\'registration\') == $request->url())){
             return back();
         }
         return $next($request);';
@@ -157,7 +151,7 @@ class MainViewCommand extends GeneratorCommand
             '{{Condition}}',$condition, $sessionAuthTemplate);
     }
 
-    public function add()
+    protected function addToKernel()
     {
         $f = fopen(app_path("/Http/Kernel.php"), "r+");
 
@@ -188,17 +182,28 @@ class MainViewCommand extends GeneratorCommand
         $fileName = "".date('Y_m_d_His')."_crudusers.php";
 
         $routes = "
-Route::get('/login',[CrudUserController::class,'login'])->middleware('crudSessionAuth');
-Route::get('/registration',[CrudUserController::class,'registration'])->middleware('crudSessionAuth');
-Route::post('/register-user',[CrudUserController::class,'registerUser'])->name('register-user');
-Route::post('/login-user',[CrudUserController::class,'loginUser'])->name('login-user');
-Route::get('/admin',[CrudUserController::class,'layout'])->middleware('crudAuth');
-Route::get('/logout',[CrudUserController::class,'logout']);
+Route::get('/login',[App\Http\Controllers\CrudUserController::class,'login'])->middleware('crudSessionAuth');
+Route::get('/registration',[App\Http\Controllers\CrudUserController::class,'registration'])->middleware('crudSessionAuth');
+Route::post('/register-user',[App\Http\Controllers\CrudUserController::class,'registerUser'])->name('register-user');
+Route::post('/login-user',[App\Http\Controllers\CrudUserController::class,'loginUser'])->name('login-user');
+Route::get('/admin',[App\Http\Controllers\CrudUserController::class,'layout'])->middleware('crudAuth');
+Route::get('/logout',[App\Http\Controllers\CrudUserController::class,'logout']);
 Route::get('/crud', function () {return view('crud');})->middleware('crudSessionAuth');\n";
 
-        if(file_exists(base_path("/resources/views/layout.blade.php")) or file_exists(base_path("/resources/views/extendLayout.blade.php")))  {
+        if(file_exists(base_path("/resources/views/layout.blade.php")) or
+            file_exists(base_path("/resources/views/extendLayout.blade.php")) or
+            file_exists(base_path("/resources/views/crud.blade.php")) or
+            file_exists(base_path("/resources/views/login.blade.php")) or
+            file_exists(base_path("/resources/views/register.blade.php")) or
+            file_exists(app_path("/Http/Controllers/CrudUserController.php")) or
+            file_exists(app_path("/Http/Middleware/AuthCheck.php")) or
+            file_exists(app_path("/Http/Middleware/SessionCheck.php")) or
+            file_exists(app_path("/Http/Models/Cruduser.php"))
+        )  {
             try {
-                return throw new Exception("One of files (layout.blade.php or extendLayout.blade.php) already exists! Please check /resources/views!");
+                return throw new Exception("One of files (layout.blade.php or extendLayout.blade.php, crud.blade.php,
+                login.blade.php, register.blade.php, CrudUserController.php, AuthCheck.php, SessionCheck.php, Cruduser.php)
+                already exists! This command should be used only once to create main view for system!");
             } catch(Exception $e) {
                 echo $e->getMessage();
                 exit(1);
@@ -220,10 +225,12 @@ Route::get('/crud', function () {return view('crud');})->middleware('crudSession
 
 
             File::append(base_path('routes/web.php'), $routes);
-            $this->info("New route was added to routes/web.php file!");
+            $this->info("New routes were added to routes/web.php file!");
             $this->info("You're CRUD app is ready!");
-            $this->info("You can view it no http://127.0.0.1:8000/crud");
-            $this->info("Do not forget to run 'php artisan migrate' command first!");
+            $this->info("You can view it no http://localhost/crud");
+            $this->info("Please first run 'php artisan migrate' command!");
+            $this->info("New user with administrator privileges - email: admin@gmail.com password: adm1nCrud2023");
+            $this->info("New user without administrator privileges - email: user@gmail.com password: UserCrud2023");
             $this->info("To start the app run 'php artisan serve' command!");
         }
     }

@@ -1,5 +1,4 @@
 @extends('layout')
-
 @section('content')
     <div class="card-header">Welcome to your CRUD generator!</div>
     <div class="card-body">

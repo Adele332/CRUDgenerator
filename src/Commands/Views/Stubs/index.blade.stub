@@ -1,7 +1,5 @@
 @extends('layout')
-
 @section('content')
-
     <div class="card-header">{{ViewName}}</div>
     <div class="card-body">
         @if($data->isAdmin == 1)

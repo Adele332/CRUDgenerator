@@ -13,6 +13,7 @@ class MigrationCommand extends GeneratorCommand
      *
      * @var string
      */
+    // php artisan make:migrations Genres --table-schema="title:string"
     protected $signature = 'make:migrations
                             {name : Name of newly created migration, provide name for what DB table will be created (example Genres).}
                             {--table-schema= : Database table schema.}
@@ -34,7 +35,6 @@ class MigrationCommand extends GeneratorCommand
     public function handle()
     {
         $input = $this->getData();
-
         $migrationTemplate = $this->getStub();
 
         $this->replaceClassName($input->name,$migrationTemplate);
@@ -73,9 +73,6 @@ class MigrationCommand extends GeneratorCommand
 
     protected function replaceSchemaUp($schema, $name, $foreign, &$migrationTemplate)
     {
-       // --schema="name:string, quantity:integer, price:float, userId:integer"
-       // php artisan make:migrations Games --table-schema="name:string,quantity:integer,price:float,genre_id:foreignId" --foreign="genre_id,id,genres"
-
         $schemaField = explode(',', $schema);
 
         if(!empty($schema)) {
@@ -86,14 +83,14 @@ class MigrationCommand extends GeneratorCommand
                         $function[$schema] = "\$table->" . $schemaArray[1] . "('" . $schemaArray[0] . "')->nullable();
                 ";
                     }else{try {
-                        return throw new Exception("Please provided schema fields with name and type! For example: --schema=\"name:string\"");
+                        return throw new Exception("Please provide schema at least one field with name and type! For example: --schema=\"name:string\"");
                     } catch (Exception $e) {
                         echo $e->getMessage();
                         exit(1);
                     }}
                 }else {
                     try {
-                        return throw new Exception("Please provided schema fields with name and type! For example: --schema=\"name:string\"");
+                        return throw new Exception("Please provide schema at least one field with name and type! For example: --schema=\"name:string\"");
                     } catch (Exception $e) {
                         echo $e->getMessage();
                         exit(1);
@@ -109,8 +106,6 @@ class MigrationCommand extends GeneratorCommand
             }
         }
 
-        // $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
-        // --foreign="userId,id,users"
         $text = explode(';', $foreign);
 
         if(!empty($foreign)) {
@@ -155,6 +150,5 @@ class MigrationCommand extends GeneratorCommand
         file_put_contents(base_path("/database/migrations/".$fileName.""), $migrationTemplate);
         $this->info("New migration was created!");
         $this->info("Do not forget to run 'php artisan migrate' command!");
-
     }
 }

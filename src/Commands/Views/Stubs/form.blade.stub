@@ -8,15 +8,10 @@
             Create new {{ModelName}}
         @endif
     </div>
-
         <div class="card-body">
-
-            {{-- Form::model ir Form::open metodai automatiškai prideda prie formos CSRF žetoną, todėl atskirai jo aprašyti nereikia --}}
             @if(isset(${{ModelName}}))
-                {{-- Eamo įrašo redagavimo forma --}}
                 {!! Form::model(${{ModelName}}, ['url' => ['admin/{{PluralNameLower}}', ${{ModelName}}->id], 'method' => 'patch']) !!}
             @else
-                {{-- Naujo įrašo įvedimo forma; metodo nereikia nurodyti, nes pagal nutylėjimą jis yra 'post' --}}
                 {!! Form::open(['url' => 'admin/{{PluralNameLower}}', 'method' => 'post']) !!}
             @endif
             {{inputFields}}
@@ -27,5 +22,4 @@
             </div>
             {!! Form::close() !!}
         </div>
-
 @endsection

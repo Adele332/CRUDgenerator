@@ -12,7 +12,8 @@ class ControllerCommand extends GeneratorCommand
      * The name and signature of the console command.
      * * @var string
      */
-
+    // php artisan make:controllers Genres --model="Genre" --fields-validation="'title' => 'required|alpha|min:2'" --dir-to-save-file=Admin
+    // mandatory parameters = name-of-controller, models, fields-validation, dir-to-save-file
     protected $signature = 'make:controllers
                             {name-of-controller : The name of newly created controller (name should be in plural).}
                             {--model= : The name of model which will be used for new controller.}
@@ -34,10 +35,6 @@ class ControllerCommand extends GeneratorCommand
     public function handle()
     {
         $input = $this->getData();
-
-        //$filePlace = $this->getPath($input->name);
-        //if($this->alreadyExists($filePlace)) return false;
-
         $controllerTemplate = $this->getStub();
 
         $this->replaceName($input->name,$controllerTemplate);
@@ -75,9 +72,18 @@ class ControllerCommand extends GeneratorCommand
 
     protected function replaceModel($model, &$controllerTemplate)
     {
-        $controllerTemplate = str_replace(
-            '{{ModelName}}',$model, $controllerTemplate);
-        return $this;
+        if (!empty($model)) {
+            $controllerTemplate = str_replace(
+                '{{ModelName}}', $model, $controllerTemplate);
+            return $this;
+        }else{
+            try {
+                return throw new Exception("Please use mandatory parameter --model!");
+            } catch(Exception $e) {
+                echo $e->getMessage();
+                exit(1);
+            }
+        }
     }
 
     protected function replaceNameInLowerCase($name, &$controllerTemplate)
@@ -109,7 +115,7 @@ class ControllerCommand extends GeneratorCommand
 
     protected function replaceValidation($validate, &$controllerTemplate)
     {
-        if($validate != '') {
+        if(!empty($validate)) {
             $validateStruct = "\$request->validate( [" . $validate . "]);\n";
             $controllerTemplate = str_replace('{{validationFields}}', $validateStruct, $controllerTemplate);
         }else{
@@ -124,21 +130,22 @@ class ControllerCommand extends GeneratorCommand
         if(!file_exists($path = app_path("/Http/Controllers/{$newDir}")))
             mkdir($path, 0777, true);
 
-        if($newDir != '') {
+        if(!empty($newDir)) {
             $controllerTemplate = str_replace(
                 '{{DirectoryName}}', '\\'.$newDir, $controllerTemplate);
         }else{$controllerTemplate = str_replace(
             '{{DirectoryName}}', '', $controllerTemplate);}
 
-            if(!file_exists(app_path("/Http/Controllers/{$newDir}/{$name}Controller.php")))  {
-                file_put_contents(app_path("/Http/Controllers/{$newDir}/{$name}Controller.php"), $controllerTemplate);
-                $this->info("New controller was created!");
-            }else{
-                try {
-                    return throw new Exception("This file already exists!");
-                } catch(Exception $e) {
-                    echo $e->getMessage();
-                }
+        if(!file_exists(app_path("/Http/Controllers/{$newDir}/{$name}Controller.php")))  {
+            file_put_contents(app_path("/Http/Controllers/{$newDir}/{$name}Controller.php"), $controllerTemplate);
+            $this->info("New controller was created!");
+        }else{
+            try {
+                return throw new Exception("This controller file already exists!");
+            } catch(Exception $e) {
+                echo $e->getMessage();
+                exit(1);
             }
+        }
     }
 }

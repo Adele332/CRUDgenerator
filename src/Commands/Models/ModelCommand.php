@@ -9,14 +9,15 @@ class ModelCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
-     * * @var strin
+     * * @var string
      */
-
+// php artisan make:model Genre --table="genres" --fields="['id','title','created_at','updated_at']"
+// mandatory = table, fields
     protected $signature = 'make:model
-                            {name-of-model : The name of newly created model. PRIVALOMAS}
-                            {--table= : Name of the table in database. PRIVALOMAS}
-                            {--fields= : Columns names in newly created table. PRIVALOMAS}
-                            {--relation= : The relationships between models. PASIRENKAMAS}';
+                            {name-of-model : The name of newly created model.}
+                            {--table= : Name of the table in database.}
+                            {--fields= : Columns names in newly created table.}
+                            {--relation= : The relationships between models.}';
 
     /** The console command description. */
 
@@ -32,10 +33,6 @@ class ModelCommand extends GeneratorCommand
     public function handle()
     {
         $input = $this->getData();
-
-        //$filePlace = $this->getPath($input->name);
-        //if($this->alreadyExists($filePlace)) return false;
-
         $modelTemplate = $this->getStub();
 
         $this->replaceName($input->name,$modelTemplate);
@@ -69,18 +66,36 @@ class ModelCommand extends GeneratorCommand
 
     protected function replaceTable($table, &$modelTemplate)
     {
-        $modelTemplate = str_replace('{{table}}',
-            $table,
-            $modelTemplate);
-        return $this;
+        if (!empty($table)) {
+            $modelTemplate = str_replace('{{table}}',
+                $table,
+                $modelTemplate);
+            return $this;
+        }else{
+            try {
+                return throw new Exception("Please use mandatory parameter --table!");
+            } catch(Exception $e) {
+                echo $e->getMessage();
+                exit(1);
+            }
+        }
     }
 
     protected function replaceFields($fields, &$modelTemplate)
     {
-        $modelTemplate = str_replace('{{fields}}',
-            $fields,
-            $modelTemplate);
-        return $this;
+        if (!empty($fields)) {
+            $modelTemplate = str_replace('{{fields}}',
+                $fields,
+                $modelTemplate);
+            return $this;
+        }else{
+            try {
+                return throw new Exception("Please use mandatory parameter --fields!");
+            } catch(Exception $e) {
+            echo $e->getMessage();
+            exit(1);
+            }
+        }
     }
 
     protected function replaceRelation($relation, &$modelTemplate)
@@ -90,7 +105,7 @@ class ModelCommand extends GeneratorCommand
         if(!empty($relation)) {
             foreach ($relations as $relation) {
                 $relationArray = explode(',', $relation);
-                if (count($relationArray) > 3) {
+                if (count($relationArray) === 4) {
                     $function[$relation] = "\n    public function " . $relationArray[1] . "()
         {
             return \$this->" . $relationArray[0] . "(" .
@@ -98,7 +113,15 @@ class ModelCommand extends GeneratorCommand
                         $relationArray[2] . "','" .
                         $relationArray[3] . "');
         }";
+                }else{
+                    try {
+                        return throw new Exception("Please provide 4 values for one relation separated by comma!");
+                    } catch(Exception $e) {
+                        echo $e->getMessage();
+                        exit(1);
+                    }
                 }
+
             }
 
             $modelTemplate = str_replace(
@@ -117,7 +140,6 @@ class ModelCommand extends GeneratorCommand
     protected function putContentToFile($name, $modelTemplate)
     {
         if(!file_exists($path = app_path("/Models/{$name}.php"))){
-            //mkdir($path, 0777, true);
             file_put_contents(app_path("/Models/{$name}.php"), $modelTemplate);
             $this->info("New model was created!");
         }else{
@@ -125,6 +147,7 @@ class ModelCommand extends GeneratorCommand
                 return throw new Exception("Model $name already exists!");
             } catch(Exception $e) {
                 echo $e->getMessage();
+                exit(1);
             }
         }
     }
