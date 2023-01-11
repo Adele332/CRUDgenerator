@@ -13,7 +13,6 @@ class MigrationCommand extends GeneratorCommand
      *
      * @var string
      */
-    // php artisan make:migrations Genres --table-schema="title:string"
     protected $signature = 'make:migrations
                             {name : Name of newly created migration, provide name for what DB table will be created (example Genres).}
                             {--table-schema= : Database table schema.}

@@ -12,7 +12,6 @@ class MainViewCommand extends GeneratorCommand
      * The name and signature of the console command.
      * * @var string
      */
-// php artisan make:main Test
     protected $signature = 'make:main
                             {name : The name of main layout (best to provide your DB name).}';
 

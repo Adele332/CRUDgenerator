@@ -11,8 +11,6 @@ class ModelCommand extends GeneratorCommand
      * The name and signature of the console command.
      * * @var string
      */
-// php artisan make:model Genre --table="genres" --fields="['id','title','created_at','updated_at']"
-// mandatory = table, fields
     protected $signature = 'make:model
                             {name-of-model : The name of newly created model.}
                             {--table= : Name of the table in database.}

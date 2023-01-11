@@ -12,8 +12,7 @@ class ControllerCommand extends GeneratorCommand
      * The name and signature of the console command.
      * * @var string
      */
-    // php artisan make:controllers Genres --model="Genre" --fields-validation="'title' => 'required|alpha|min:2'" --dir-to-save-file=Admin
-    // mandatory parameters = name-of-controller, models, fields-validation, dir-to-save-file
+
     protected $signature = 'make:controllers
                             {name-of-controller : The name of newly created controller (name should be in plural).}
                             {--model= : The name of model which will be used for new controller.}

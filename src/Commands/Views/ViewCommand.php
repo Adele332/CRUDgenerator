@@ -14,8 +14,6 @@ class ViewCommand extends Command
      * The name and signature of the console command.
      * * @var string
      */
-// php artisan make:view Genres --crud=GenresCotroller --table=genres --columns="id,title,updated_at"
-// mandatory = crud, table, columns
     protected $signature = 'make:view
                             {name-of-view : The name of newly created view, example Genres.}
                             {--crud= : Name of the controller to get crud functionality, will be used to create a route, please provide full name.}
