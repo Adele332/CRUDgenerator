@@ -19,7 +19,7 @@ class ModelCommand extends GeneratorCommand
 
     /** The console command description. */
 
-    protected $description = 'For creating a new Model';
+    protected $description = 'For creating a new Model.';
 
     /** Execute the console command.  */
 
