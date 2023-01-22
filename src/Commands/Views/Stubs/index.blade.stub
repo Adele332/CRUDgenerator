@@ -3,7 +3,7 @@
     <div class="card-header">{{ViewName}}</div>
     <div class="card-body">
         @if($data->isAdmin == 1)
-        <a href="{{ url('admin/{{NameLowerCase}}/create') }}" class="btn btn-success btn-sm" style="float: right;">Add genre</a>
+        <a href="{{ url('admin/{{NameLowerCase}}/create') }}" class="btn btn-success btn-sm" style="float: right;">Add New</a>
         <br>
         @endif
         <br>
