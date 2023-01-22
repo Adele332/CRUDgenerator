@@ -22,7 +22,7 @@ class ViewCommand extends Command
 
     /** The console command description. */
 
-    protected $description = 'For creating a new views.';
+    protected $description = 'For creating new views.';
 
     /** Execute the console command.  */
 

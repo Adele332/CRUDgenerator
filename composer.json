@@ -21,7 +21,7 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "doctrine/dbal": "*",
         "laravelcollective/html": "*"

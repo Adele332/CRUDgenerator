@@ -22,7 +22,7 @@ class ControllerCommand extends GeneratorCommand
 
     /** The console command description. */
 
-    protected $description = 'For creating a new Controller';
+    protected $description = 'For creating a new Controller.';
 
     /** Execute the console command.  */
 

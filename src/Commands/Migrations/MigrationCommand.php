@@ -24,7 +24,7 @@ class MigrationCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'For creating new migration.';
+    protected $description = 'For creating a new migration.';
 
     protected function getStub()
     {

@@ -17,7 +17,7 @@ class MainViewCommand extends GeneratorCommand
 
     /** The console command description. */
 
-    protected $description = 'For creating a main View, to use CRUD';
+    protected $description = 'For creating a main View, to use CRUD functionality.';
 
     /** Execute the console command.  */
 
