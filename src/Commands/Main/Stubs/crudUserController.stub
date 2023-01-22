@@ -17,7 +17,7 @@ class CrudUserController extends Controller
 
     public function registration()
     {
-        return view("registration");
+        return view("register");
     }
 
     public function registerUser(Request $request)
